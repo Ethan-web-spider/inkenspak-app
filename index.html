@@ -12,7 +12,7 @@
   <meta name="apple-mobile-web-app-title" content="Inkenspak" />
   <link rel="apple-touch-icon" href="logo.png" />
 
-  <!-- External Stylesheet (optional) -->
+  <!-- Styles -->
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
@@ -35,14 +35,13 @@
   <!-- NLP Library -->
   <script src="https://unpkg.com/compromise"></script>
 
-  <!-- Modular App Logic -->
-  <script type="module">
-    import keywordMap from './keywords.js';
-    import detectWithNLP from './compromise.js';
-    import './app.js';
+  <!-- Load Keyword Map -->
+  <script src="keywords.js"></script>
 
-    window.keywordMap = keywordMap;
-    window.detectWithNLP = detectWithNLP;
-  </script>
+  <!-- Load NLP Logic -->
+  <script src="compromise.js"></script>
+
+  <!-- Main App Logic -->
+  <script src="app.js"></script>
 </body>
 </html>

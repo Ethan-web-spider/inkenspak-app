@@ -1,5 +1,7 @@
-keyword.js
-const keywordMap = {
+keywords.js
+// keywords.js
+
+window.keywordMap = {
   Reflection: [
     "think", "wonder", "realize", "remember", "consider", "self", "understand", "awareness", "contemplate", "intuition",
     "meaning", "truth", "values", "identity", "reflect", "mind", "soul", "lesson", "purpose", "past",
@@ -33,5 +35,3 @@ const keywordMap = {
   ],
   Random: []
 };
-
-export default keywordMap;

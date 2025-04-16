@@ -1,6 +1,4 @@
-// app.js - Fully rebuilt version
-
-import './compromise.js';
+// app.js
 
 const categories = ["Reflection", "Plans", "Emotions", "Productivity", "Growth", "Conversations", "Random"];
 const colors = {
@@ -9,9 +7,11 @@ const colors = {
 };
 
 function detectCategory(text) {
-  const t = text.toLowerCase();
-  for (let cat of categories) {
-    if (window.keywordMap[cat].some(word => t.includes(word))) return cat;
+  const lowered = text.toLowerCase();
+  for (const cat of categories) {
+    if (window.keywordMap[cat].some(word => lowered.includes(word))) {
+      return cat;
+    }
   }
   return window.detectWithNLP ? window.detectWithNLP(text) : "Random";
 }
@@ -25,14 +25,13 @@ const orbitSpeed = 0.00075;
 const categoryElements = {};
 const thoughtBubbles = {};
 let time = 0;
-let currentOverlay = null;
+let rec = null;
 let isRecording = false;
-let rec;
 
 const popSounds = ["pop1.wav", "pop2.wav", "pop3.wav", "pop4.wav"].map(src => {
-  const audio = new Audio(src);
-  audio.load();
-  return audio;
+  const a = new Audio(src);
+  a.load();
+  return a;
 });
 
 function createCategoryBubbles() {
@@ -42,17 +41,22 @@ function createCategoryBubbles() {
     el.innerText = cat;
     el.style.setProperty('--cat-color', colors[cat]);
     canvas.appendChild(el);
-    categoryElements[cat] = { el: el, angle: (i / categories.length) * 2 * Math.PI };
+
+    categoryElements[cat] = {
+      el: el,
+      angle: (i / categories.length) * 2 * Math.PI
+    };
     thoughtBubbles[cat] = [];
+
     el.onclick = () => {
       if (navigator.vibrate) navigator.vibrate(20);
-      openZoom(cat);
+      alert(`Category: ${cat}`); // Replace with zoom logic if needed
     };
   });
 }
 
 function animate() {
-  time += 1;
+  time++;
   categories.forEach(cat => {
     const angle = categoryElements[cat].angle + time * orbitSpeed;
     const x = center.x + orbitRadius * Math.cos(angle) - 45;
@@ -72,36 +76,38 @@ function animate() {
 }
 
 function addThought(text) {
-  const sanitized = text.replace(/</g, "&lt;").replace(/>/g, "&gt;");
-  const cat = detectCategory(sanitized);
+  const safeText = text.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  const cat = detectCategory(safeText);
   if (thoughtBubbles[cat].length >= 7) return;
+
   const bubble = document.createElement("div");
   bubble.className = "bubble";
-  bubble.innerText = sanitized;
+  bubble.innerText = safeText;
   bubble.style.setProperty('--bubble-color', colors[cat]);
   bubble.style.left = `${center.x}px`;
   bubble.style.top = `${center.y}px`;
   canvas.appendChild(bubble);
   thoughtBubbles[cat].push(bubble);
 
-  let frame = 0;
-  const maxFrames = 120;
   const target = categoryElements[cat].el.getBoundingClientRect();
   const targetX = target.left + target.width / 2;
   const targetY = target.top + target.height / 2;
   const startX = center.x;
   const startY = center.y;
 
-  function animateMove() {
+  let frame = 0;
+  const maxFrames = 120;
+
+  function move() {
     frame++;
     const t = Math.min(1, frame / maxFrames);
     const x = startX + (targetX - startX) * t;
     const y = startY + (targetY - startY) * t;
     bubble.style.left = `${x}px`;
     bubble.style.top = `${y}px`;
-    if (t < 1) requestAnimationFrame(animateMove);
+    if (t < 1) requestAnimationFrame(move);
   }
-  animateMove();
+  move();
 
   bubble.onclick = (e) => {
     e.stopPropagation();
@@ -112,66 +118,64 @@ function addThought(text) {
     if (navigator.vibrate) navigator.vibrate(30);
     setTimeout(() => {
       bubble.remove();
-      const index = thoughtBubbles[cat].indexOf(bubble);
-      if (index !== -1) thoughtBubbles[cat].splice(index, 1);
+      const i = thoughtBubbles[cat].indexOf(bubble);
+      if (i !== -1) thoughtBubbles[cat].splice(i, 1);
     }, 300);
   };
 }
 
-function setupInputHandlers() {
-  document.getElementById("addButton").onclick = () => {
+function setupInput() {
+  const addBtn = document.getElementById("addButton");
+  const mobileBtn = document.getElementById("mobileAddButton");
+
+  const handle = () => {
     const val = input.value.trim();
     if (val.length >= 3) {
       addThought(val);
       input.value = "";
     }
   };
-  document.getElementById("mobileAddButton").onclick = () => {
-    const val = input.value.trim();
-    if (val.length >= 3) {
-      addThought(val);
-      input.value = "";
-    }
-  };
+
+  addBtn.onclick = handle;
+  mobileBtn.onclick = handle;
+
   input.addEventListener("keydown", e => {
-    if (e.key === "Enter") {
-      const val = input.value.trim();
-      if (val.length >= 3) {
-        addThought(val);
-        input.value = "";
-      }
-    }
+    if (e.key === "Enter") handle();
   });
 }
 
 function setupMic() {
-  micBtn.addEventListener('mousedown', (e) => {
-    if (e.button !== 0) return;
+  micBtn.addEventListener('mousedown', () => {
     if (isRecording) {
       stopRecording();
       return;
     }
+
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-    if (!SpeechRecognition) return alert("Speech recognition not supported.");
+    if (!SpeechRecognition) return alert("Speech recognition not supported in this browser.");
+
     rec = new SpeechRecognition();
     rec.continuous = true;
     rec.lang = "en-US";
     rec.interimResults = false;
+
     rec.onresult = e => {
       for (let i = e.resultIndex; i < e.results.length; i++) {
-        const result = e.results[i];
-        const text = result[0].transcript.trim();
-        if (result.isFinal && text.length > 3) {
-          text.split(/(?<=[.?!])\s+/).forEach(p => {
+        const r = e.results[i];
+        const t = r[0].transcript.trim();
+        if (r.isFinal && t.length > 3) {
+          t.split(/(?<=[.?!])\s+/).forEach(p => {
             if (p.trim().length > 3) addThought(p.trim());
           });
         }
       }
     };
+
     rec.onerror = e => console.error("Mic error:", e);
     rec.onend = () => stopRecording();
+
     rec.start();
-    micBtn.classList.add('recording');
+    micBtn.classList.add("recording");
     micBtn.style.backgroundColor = '#4CAF50';
     isRecording = true;
   });
@@ -179,12 +183,13 @@ function setupMic() {
 
 function stopRecording() {
   if (rec) rec.stop();
-  micBtn.classList.remove('recording');
+  micBtn.classList.remove("recording");
   micBtn.style.backgroundColor = '#e53935';
   isRecording = false;
 }
 
+// Initialize app
 createCategoryBubbles();
-setupInputHandlers();
+setupInput();
 setupMic();
 animate();
