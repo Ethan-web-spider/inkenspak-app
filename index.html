@@ -186,7 +186,7 @@
     const input = document.getElementById("thoughtInput");
     const micBtn = document.getElementById("micButton");
     const center = { x: window.innerWidth / 2, y: (window.innerHeight - 60) / 2 };
-    const orbitRadius = 220;
+    const orbitRadius = 160;
     const orbitSpeed = 0.00075;
     const categoryElements = {};
     const thoughtBubbles = {};
@@ -306,8 +306,8 @@
 
       const container = document.createElement("div");
       container.style.position = 'absolute';
-      container.style.width = '260px';
-      container.style.height = '260px';
+      container.style.width = '200px';
+      container.style.height = '200px';
       container.style.borderRadius = '50%';
       container.style.background = `radial-gradient(circle at 30% 30%, rgba(255,255,255,0.3), ${colors[cat]})`;
       container.style.left = '50%';
@@ -316,7 +316,7 @@
       container.style.transition = 'transform 0.5s ease';
       overlay.appendChild(container);
       setTimeout(() => {
-        container.style.transform = 'translate(-50%, -50%) scale(2.2)';
+        container.style.transform = 'translate(-50%, -50%) scale(1.5)';
       }, 10);
 
       const bubbles = [...thoughtBubbles[cat]];
