@@ -1,37 +1,171 @@
-keywords.js
-// keywords.js
-
-window.keywordMap = {
-  Reflection: [
-    "think", "wonder", "realize", "remember", "consider", "self", "understand", "awareness", "contemplate", "intuition",
-    "meaning", "truth", "values", "identity", "reflect", "mind", "soul", "lesson", "purpose", "past",
-    "experience", "evaluate", "assess", "introspect", "clarify", "insight", "growth", "memory", "analyze", "belief",
-    "bias", "mental", "emotion", "observe", "explore", "vision", "shift", "judgment", "assumption", "conclusion"
-  ],
-  Plans: [
-    "plan", "planning", "scheduled", "schedule", "meeting", "task", "deadline", "organize", "project", "arrange",
-    "prepare", "setup", "goal", "objective", "strategy", "calendar", "reminder", "event", "priority", "to-do",
-    "action", "list", "future", "target", "appointment", "map", "timeline", "assign", "agenda", "roadmap"
-  ],
-  Emotions: [
-    "feel", "feeling", "emotion", "emotional", "sad", "happy", "angry", "hate", "love", "joy", "fear", "worry",
-    "anxiety", "hope", "grief", "lonely", "excitement", "relief", "shame", "guilt", "calm", "panic", "stress",
-    "bliss", "resentment", "mood", "energy", "hurt", "cry", "tear", "laugh", "tired", "peaceful"
-  ],
-  Productivity: [
-    "work", "task", "complete", "done", "focus", "deadline", "effort", "output", "sprint", "assign",
-    "goal", "deliver", "project", "schedule", "timebox", "progress", "checklist", "review", "plan", "build",
-    "move", "ship", "update", "track", "optimize", "flow", "clear", "daily", "weekly", "habit"
-  ],
-  Growth: [
-    "grow", "growth", "improve", "develop", "advance", "learn", "skill", "training", "education", "habit",
-    "mature", "evolve", "refine", "upgrade", "change", "level up", "breakthrough", "effort", "practice", "discipline",
-    "coaching", "mentoring", "feedback", "resilience", "grit", "better", "journey", "transform", "focus", "goal"
-  ],
-  Conversations: [
-    "talk", "talked", "said", "say", "message", "text", "email", "call", "meeting", "chat", "conversation",
-    "ask", "question", "reply", "respond", "discuss", "told", "hear", "listen", "words", "voice", "speech",
-    "communication", "conversation", "debate", "dialogue", "exchange", "mention", "express", "statement", "response"
-  ],
-  Random: []
-};
+export const categories = [
+    "Reflection", "Plans", "Emotions",
+    "Productivity", "Growth", "Conversations", "Random"
+  ];
+  
+  export const colors = {
+    Reflection: '#6C63FF',
+    Plans: '#00C896',
+    Emotions: '#FF6B6B',
+    Productivity: '#F9A825',
+    Growth: '#A3E635',
+    Conversations: '#29B6F6',
+    Random: '#9C27B0'
+  };
+  
+  export const keywordMap = {
+    Random: [],
+  
+    Reflection: [
+      "contemplate", "ponder", "ruminate", "introspect", "analyze", "evaluate", "self-awareness",
+      "observe", "question", "think", "realize", "recognize", "philosophize", "consider",
+      "reassess", "revisit", "clarify", "meditate", "mull", "reflect", "journal", "remember",
+      "recall", "experience", "perspective", "balance", "discern", "awareness", "identity",
+      "introspection", "focus", "truth", "clarity", "depth", "meaning", "purpose", "values",
+      "emotion", "mental", "soul", "insight", "lessons", "memory", "past", "future", "feedback",
+      "growth", "resolve", "why", "reason", "mindset", "shift", "realization", "lesson", "inner",
+      "quiet", "energy", "response", "intuition", "assess", "weigh", "judge", "consideration",
+      "assumption", "bias", "synthesis", "enlighten", "mirror", "legacy", "conclusion",
+      "conscience", "roots", "understand", "acceptance", "note", "track", "compare",
+      "emotional", "abstract", "logic", "vision", "worldview", "accept", "deep dive",
+      "conceptualize", "overview", "hindsight", "mentality", "insightful",
+      "transparency", "self-worth", "reframe", "reflective", "speculate", "awaken",
+      "mindfulness", "interpret", "sense", "self-study", "narrative",
+      "reflective thinking", "value", "meaningful", "mental model", "identity shift",
+      "intellectual", "deep thought", "reasoning", "perspective shift", "context",
+      "clarify purpose", "explore self", "inner truth", "realign", "self-image", "trace",
+      "overviewing", "feedback loop", "recheck", "pattern recognition", "perception",
+      "thought trail", "truth-seeking", "core values", "directional thinking",
+      "motivational review", "behavior analysis", "outlook", "thought alignment",
+      "critical thinking", "self-question", "evaluate outcomes", "emotional review",
+      "self-check", "mental clarity", "define self", "core beliefs", "self-dialogue",
+      "brain loop", "purpose-driven", "value alignment", "ideological view",
+      "worldview review", "analyze behavior", "intellectual honesty", "thought validation",
+      "framework", "principles", "cognitive view", "inner bias", "bias check",
+      "moral compass", "identity review", "retrospect", "self-history", "thought path",
+      "question motive", "philosophical view", "deep reason", "why pattern",
+      "feedback pattern", "truth map", "reflection phase", "self-discovery",
+      "cognitive map", "conscious thought", "perspective arc", "mental process",
+      "assumptive view"
+    ],
+  
+    Plans: [
+      "plan", "agenda", "goal", "schedule", "event", "prepare", "strategy", "organize",
+      "priority", "next", "future", "deadline", "meeting", "to-do", "calendar", "reminder",
+      "appointment", "objective", "target", "task", "errand", "item", "overview", "map",
+      "route", "travel", "trip", "conference", "invite", "review", "commitment", "routine",
+      "habit", "setup", "logistics", "list", "steps", "chart", "milestone", "progress",
+      "execute", "draft", "proposal", "layout", "assign", "roadmap", "launch", "timing",
+      "estimate", "prep", "checklist", "workflow", "blueprint", "forecast", "goals",
+      "visions", "timeline", "direction", "intent", "structure", "initiate", "strategize",
+      "queue", "action", "daily", "weekly", "monthly", "intentions", "outline", "kickoff",
+      "timeframe", "notify", "flag", "action-plan", "get done", "coordinate", "ongoing",
+      "block", "slot", "period", "check-in", "rundown", "targets", "assignment",
+      "objectives", "align", "deploy", "implement", "brief", "recap", "planning",
+      "mapped", "breakdown", "marker", "divide", "hour", "blocker", "sketch", "design",
+      "move", "aim", "status", "organization", "priorities", "project", "track",
+      "backlog", "sprint", "deliverable", "phases", "execution", "tasklist", "cycle",
+      "iteration", "scope", "resources", "constraints", "budget", "duration",
+      "milestones", "dependencies", "update", "risk", "feedback", "launch plan",
+      "revisit", "fine-tune", "adjust", "evaluate", "reschedule", "propose",
+      "flowchart", "diagram", "templates", "automation", "sequence", "repetition",
+      "handoff", "approval", "roadblock", "collaboration", "ownership", "follow-up",
+      "set date", "deadline-driven", "date range", "time slot", "time cap",
+      "time sensitive", "critical path", "planning phase", "review cycle",
+      "execution stage", "scope of work", "status report", "timeline estimate",
+      "timeline check", "to-do sync", "next step", "aligned goal", "launch prep",
+      "scheduled", "tracked", "time audit", "estimated", "delegated", "assigned",
+      "actioned", "roadmapped", "synced", "confirmed", "prioritized", "grouped",
+      "checklisted", "bucketed", "batched", "reminded", "automated", "restructured",
+      "staged", "broken down", "calendared", "flagged", "statused", "slotted",
+      "reordered", "queued", "blocked", "cleared"
+    ],
+  
+    Emotions: [
+      "happy", "sad", "angry", "joy", "grief", "depressed", "anxious", "worry", "calm",
+      "fear", "guilt", "shame", "love", "hope", "excited", "tired", "exhausted", "lonely",
+      "peaceful", "rage", "frustrated", "tense", "uneasy", "irritated", "annoyed",
+      "jealous", "envy", "proud", "disgust", "sick", "blame", "upset", "shaken", "mood",
+      "mindset", "heart", "cried", "laugh", "shiver", "emotion", "emotional", "bliss",
+      "resentment", "burnout", "panic", "elated", "serene", "relaxed", "relief",
+      "warmth", "gratitude", "happiness", "emotionally", "feel", "feelings", "ache",
+      "breakdown", "melancholy", "affection", "sympathy", "compassion", "joyful",
+      "cheer", "sorrow", "comfort", "hurt", "confused", "smile", "tear", "dejected",
+      "wounded", "fright", "tension", "fearful", "express", "cry", "burst", "trauma",
+      "triggered", "offended", "ashamed", "glad", "light", "stress", "nervous",
+      "distress", "eager", "excitement", "passion", "concern", "doubt", "trust",
+      "peace", "bitter", "sensitive", "loved", "unloved", "choked", "conflict",
+      "touched", "mourn", "weep", "fury", "vibe", "low", "high", "stable",
+      "insecure", "unstable", "broken", "boost", "hopeless", "energized",
+      "support", "overwhelmed", "suppress", "mad", "moody", "confide", "gush",
+      "vent", "relate", "attach", "empathize", "cling", "explode", "detached",
+      "crying", "healing", "healed", "heartfelt", "longing", "loss", "bursting",
+      "secure", "hopeful", "hate", "loathe", "contempt", "spite", "hostile",
+      "displease", "recoil", "revulsion", "scorn", "abhorrence", "detest",
+      "despise", "dislike"
+    ],
+  
+    Productivity: [
+        "done", "accomplish", "achieve", "task", "progress", "focus", "work", "goal", "deadline", "plan",
+        "calendar", "schedule", "effort", "manage", "track", "complete", "project", "motivation", "output",
+        "efficiency", "list", "prioritize", "organized", "clarity", "pace", "momentum", "energy", "execute",
+        "follow-up", "agenda", "output", "assignment", "burnout", "delegate", "system", "method", "routine",
+        "habit", "structure", "framework", "optimize", "update", "commit", "sprint", "review", "log", "time",
+        "block", "batch", "step", "checkpoint", "metric", "todo", "workflow", "daily", "weekly", "grind",
+        "checkpoint", "productivity", "proactive", "pause", "push", "rush", "organize", "pipeline", "urgency",
+        "flow", "track", "build", "ship", "align", "optimize", "execute", "deploy", "manage", "assign",
+        "resolve", "improve", "target", "timed", "accountable", "team", "solo", "grind", "tasked", "overdue",
+        "update", "clear", "done", "polish", "effort", "timebox", "note", "standup", "lean", "scrum", "kanban",
+        "deep", "focus", "flow", "workload", "shipped", "finished", "started", "commitment", "finish",
+        "initiate", "repeat", "streak", "plan", "early", "late", "on-time", "alert", "alertness", "stuck",
+        "waiting", "move", "start", "resolve", "finish", "clear", "burn", "pace", "ramp", "slow", "delay",
+        "grind", "organize", "fast", "prioritize", "balance", "focus", "maximize", "impact", "streamline",
+        "reduce", "buffer", "gap", "effort", "finish", "rework", "allocate", "reserve", "clock", "execution",
+        "done"
+      ],
+    
+      Growth: [
+        "learn", "improve", "develop", "progress", "advance", "skill", "training", "knowledge", "education",
+        "reading", "research", "try", "attempt", "practice", "habit", "discipline", "expand", "upgrade",
+        "evolve", "refine", "enhance", "challenge", "grow", "overcome", "adapt", "transform", "iterate",
+        "level up", "build", "gain", "stretch", "breakthrough", "push", "competency", "ability", "talent",
+        "shift", "reflect", "analyze", "track", "resolve", "mature", "wisdom", "curiosity", "focus",
+        "concentration", "effort", "resilience", "grit", "vision", "potential", "strive", "master",
+        "mentor", "explore", "seek", "course", "degree", "bootcamp", "webinar", "podcast", "journal",
+        "routine", "daily", "weekly", "monthly", "goal", "short term", "long term", "revision",
+        "iteration", "feedback", "coaching", "guidance", "metrics", "result", "success", "learned",
+        "study", "path", "direction", "purpose", "clarify", "intention", "milestone", "achievement",
+        "takeaway", "mindset", "grind", "self-help", "self-care", "motivate", "performance", "ambition",
+        "drive", "actualize", "progression", "invest", "strategy", "better", "repetition", "coursework",
+        "certification", "diploma", "long-term", "journey", "optimize", "refactor", "goal-setting",
+        "setback", "bounce back", "adaptation", "pivot", "breakout", "push forward", "momentum",
+        "studious", "refine", "toolset", "gear up", "plan ahead", "learn by doing", "project-based",
+        "build skill", "personal best", "self-discipline", "progress tracker", "take action",
+        "improve daily", "habit loop", "feedback cycle", "increment", "scale up"
+      ],
+    
+      Conversations: [
+        "talk", "chat", "conversation", "call", "meeting", "zoom", "discord", "text", "message",
+        "discussion", "argue", "debate", "agree", "disagree", "speak", "say", "ask", "answer",
+        "respond", "listen", "hearing", "words", "verbal", "tone", "dialogue", "interact",
+        "feedback", "mention", "topic", "banter", "negotiate", "persuade", "influence",
+        "connect", "contact", "email", "reply", "DM", "ping", "comment", "post", "thread",
+        "note", "exchange", "interrupt", "interview", "presentation", "broadcast",
+        "announcement", "report", "inform", "tell", "notify", "vocal", "gossip",
+        "rumor", "quote", "highlight", "deliver", "clarify", "explain",
+        "speech", "voice", "communication", "verbalize", "relay", "recap", "confirm",
+        "introduce", "small talk", "dialog", "team", "group", "zoom call", "call log",
+        "voice mail", "transcript", "interaction", "expression", "pause", "chat log",
+        "say so", "follow-up", "question", "share", "lead", "talk over", "enunciate",
+        "voice out", "vocalize", "converse", "share thoughts", "mutual",
+        "paraphrase", "align", "reach out", "pinged", "group chat", "signal",
+        "slack", "inbox", "clear up", "touch base", "bring up", "go over",
+        "chat about", "catch up", "check in", "talk through", "zoom into", "podcast",
+        "story", "tell story", "anecdote", "elaborate", "compliment", "thank",
+        "respond to", "reply to", "messaged", "called", "emailed", "left a note",
+        "express", "discuss", "give input", "express opinion", "listen to",
+        "conversation starter", "ask about", "talking point",
+        "comment thread", "direct message"
+      ]
+    };
+    

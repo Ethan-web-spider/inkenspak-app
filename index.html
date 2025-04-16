@@ -3,16 +3,14 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Inkenspak</title>
+  <title>Inkenspak V10</title>
 
-  <!-- PWA Meta -->
   <link rel="manifest" href="manifest.json" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="default" />
   <meta name="apple-mobile-web-app-title" content="Inkenspak" />
   <link rel="apple-touch-icon" href="logo.png" />
 
-  <!-- Styles -->
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
@@ -20,7 +18,7 @@
     <img src="logo.png" alt="Inkenspak Logo" />
   </div>
 
-  <div id="controls">
+  <div id="controls" style="padding-bottom: 20px;">
     <input type="text" id="thoughtInput" placeholder="Speak or type your thought..." autofocus />
     <button id="addButton">Add</button>
     <button id="micButton">🎤</button>
@@ -32,16 +30,7 @@
     <button id="mobileAddButton">Add Thought</button>
   </div>
 
-  <!-- NLP Library -->
-  <script src="https://unpkg.com/compromise"></script>
-
-  <!-- Load Keyword Map -->
-  <script src="keywords.js"></script>
-
-  <!-- Load NLP Logic -->
-  <script src="compromise.js"></script>
-
-  <!-- Main App Logic -->
-  <script src="app.js"></script>
+  <!-- External JS (as ES Module) -->
+  <script type="module" src="app.js"></script>
 </body>
 </html>
