@@ -1,3 +1,5 @@
+// app.js - Fully rebuilt version
+
 import './compromise.js';
 
 const categories = ["Reflection", "Plans", "Emotions", "Productivity", "Growth", "Conversations", "Random"];
@@ -116,5 +118,73 @@ function addThought(text) {
   };
 }
 
+function setupInputHandlers() {
+  document.getElementById("addButton").onclick = () => {
+    const val = input.value.trim();
+    if (val.length >= 3) {
+      addThought(val);
+      input.value = "";
+    }
+  };
+  document.getElementById("mobileAddButton").onclick = () => {
+    const val = input.value.trim();
+    if (val.length >= 3) {
+      addThought(val);
+      input.value = "";
+    }
+  };
+  input.addEventListener("keydown", e => {
+    if (e.key === "Enter") {
+      const val = input.value.trim();
+      if (val.length >= 3) {
+        addThought(val);
+        input.value = "";
+      }
+    }
+  });
+}
+
+function setupMic() {
+  micBtn.addEventListener('mousedown', (e) => {
+    if (e.button !== 0) return;
+    if (isRecording) {
+      stopRecording();
+      return;
+    }
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SpeechRecognition) return alert("Speech recognition not supported.");
+    rec = new SpeechRecognition();
+    rec.continuous = true;
+    rec.lang = "en-US";
+    rec.interimResults = false;
+    rec.onresult = e => {
+      for (let i = e.resultIndex; i < e.results.length; i++) {
+        const result = e.results[i];
+        const text = result[0].transcript.trim();
+        if (result.isFinal && text.length > 3) {
+          text.split(/(?<=[.?!])\s+/).forEach(p => {
+            if (p.trim().length > 3) addThought(p.trim());
+          });
+        }
+      }
+    };
+    rec.onerror = e => console.error("Mic error:", e);
+    rec.onend = () => stopRecording();
+    rec.start();
+    micBtn.classList.add('recording');
+    micBtn.style.backgroundColor = '#4CAF50';
+    isRecording = true;
+  });
+}
+
+function stopRecording() {
+  if (rec) rec.stop();
+  micBtn.classList.remove('recording');
+  micBtn.style.backgroundColor = '#e53935';
+  isRecording = false;
+}
+
 createCategoryBubbles();
+setupInputHandlers();
+setupMic();
 animate();
