@@ -70,8 +70,8 @@
     }
     .category {
       position: absolute;
-      width: 160px;
-      height: 160px;
+      width: 120px;
+      height: 120px;
       border-radius: 50%;
       display: flex;
       align-items: center;
@@ -306,8 +306,8 @@
 
       const container = document.createElement("div");
       container.style.position = 'absolute';
-      container.style.width = '320px';
-      container.style.height = '320px';
+      container.style.width = '260px';
+      container.style.height = '260px';
       container.style.borderRadius = '50%';
       container.style.background = `radial-gradient(circle at 30% 30%, rgba(255,255,255,0.3), ${colors[cat]})`;
       container.style.left = '50%';
@@ -316,7 +316,7 @@
       container.style.transition = 'transform 0.5s ease';
       overlay.appendChild(container);
       setTimeout(() => {
-        container.style.transform = 'translate(-50%, -50%) scale(3.2)';
+        container.style.transform = 'translate(-50%, -50%) scale(2.2)';
       }, 10);
 
       const bubbles = [...thoughtBubbles[cat]];
@@ -381,6 +381,25 @@
       window.addEventListener('keydown', escListener);
 
       currentOverlay = overlay;
+
+      // Mobile exit button for zoom
+      const exitBtn = document.createElement("button");
+      exitBtn.innerText = "Close";
+      exitBtn.style.position = "absolute";
+      exitBtn.style.top = "10px";
+      exitBtn.style.right = "10px";
+      exitBtn.style.padding = "10px 15px";
+      exitBtn.style.border = "none";
+      exitBtn.style.borderRadius = "12px";
+      exitBtn.style.background = "#e53935";
+      exitBtn.style.color = "white";
+      exitBtn.style.fontWeight = "bold";
+      exitBtn.style.cursor = "pointer";
+      overlay.appendChild(exitBtn);
+      exitBtn.onclick = () => {
+        overlay.remove();
+        window.removeEventListener('keydown', escListener);
+      };
     }
 
     document.getElementById("addButton").onclick = () => {
