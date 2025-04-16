@@ -5,14 +5,14 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Inkenspak</title>
 
-  <!-- PWA + iOS Meta -->
+  <!-- PWA Meta -->
   <link rel="manifest" href="manifest.json" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="default" />
   <meta name="apple-mobile-web-app-title" content="Inkenspak" />
   <link rel="apple-touch-icon" href="logo.png" />
 
-  <!-- Styles (optional external) -->
+  <!-- External Stylesheet (optional) -->
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
@@ -32,11 +32,17 @@
     <button id="mobileAddButton">Add Thought</button>
   </div>
 
-  <!-- Load keywordMap and app logic -->
+  <!-- NLP Library -->
+  <script src="https://unpkg.com/compromise"></script>
+
+  <!-- Modular App Logic -->
   <script type="module">
     import keywordMap from './keywords.js';
+    import detectWithNLP from './compromise.js';
     import './app.js';
+
     window.keywordMap = keywordMap;
+    window.detectWithNLP = detectWithNLP;
   </script>
 </body>
 </html>
