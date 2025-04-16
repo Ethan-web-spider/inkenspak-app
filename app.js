@@ -1,5 +1,3 @@
-// app.js
-
 const categories = ["Reflection", "Plans", "Emotions", "Productivity", "Growth", "Conversations", "Random"];
 const colors = {
   Reflection: '#6C63FF', Plans: '#00C896', Emotions: '#FF6B6B',
@@ -50,13 +48,64 @@ function createCategoryBubbles() {
 
     el.onclick = () => {
       if (navigator.vibrate) navigator.vibrate(20);
-      alert(`Category: ${cat}`); // Replace with zoom logic if needed
+      alert(`Category: ${cat}`);
     };
   });
 }
 
+function addThought(text) {
+  const safeText = text.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  const cat = detectCategory(safeText);
+
+  if (thoughtBubbles[cat].length >= 7) return;
+
+  const bubble = document.createElement("div");
+  bubble.className = "bubble";
+  bubble.innerHTML = safeText;
+  bubble.style.setProperty('--bubble-color', colors[cat]);
+  canvas.appendChild(bubble);
+
+  thoughtBubbles[cat].push(bubble);
+
+  const targetEl = categoryElements[cat].el.getBoundingClientRect();
+  const targetX = targetEl.left + targetEl.width / 2;
+  const targetY = targetEl.top + targetEl.height / 2;
+  const startX = center.x;
+  const startY = center.y;
+  let frame = 0;
+  const maxFrames = 100;
+
+  function moveToOrbit() {
+    frame++;
+    const t = Math.min(1, frame / maxFrames);
+    const x = startX + (targetX - startX) * t;
+    const y = startY + (targetY - startY) * t;
+    bubble.style.left = `${x}px`;
+    bubble.style.top = `${y}px`;
+    if (t < 1) requestAnimationFrame(moveToOrbit);
+  }
+  moveToOrbit();
+
+  bubble.onclick = (e) => {
+    e.stopPropagation();
+    bubble.classList.add("pop-effect");
+
+    const sound = popSounds[Math.floor(Math.random() * popSounds.length)];
+    sound.currentTime = 0;
+    sound.play();
+
+    if (navigator.vibrate) navigator.vibrate(30);
+
+    setTimeout(() => {
+      bubble.remove();
+      const i = thoughtBubbles[cat].indexOf(bubble);
+      if (i !== -1) thoughtBubbles[cat].splice(i, 1);
+    }, 300);
+  };
+}
+
 function animate() {
-  time++;
+  time += 1;
   categories.forEach(cat => {
     const angle = categoryElements[cat].angle + time * orbitSpeed;
     const x = center.x + orbitRadius * Math.cos(angle) - 45;
@@ -66,62 +115,13 @@ function animate() {
     el.style.top = `${y}px`;
 
     thoughtBubbles[cat].forEach((b, i) => {
-      const offset = 10 + i * 6;
-      const innerAngle = (i / thoughtBubbles[cat].length) * 2 * Math.PI;
-      b.style.left = `${x + offset * Math.cos(innerAngle)}px`;
-      b.style.top = `${y + offset * Math.sin(innerAngle)}px`;
+      const spread = 12 + i * 6;
+      const bubbleAngle = (i / thoughtBubbles[cat].length) * 2 * Math.PI;
+      b.style.left = `${x + spread * Math.cos(bubbleAngle)}px`;
+      b.style.top = `${y + spread * Math.sin(bubbleAngle)}px`;
     });
   });
   requestAnimationFrame(animate);
-}
-
-function addThought(text) {
-  const safeText = text.replace(/</g, "&lt;").replace(/>/g, "&gt;");
-  const cat = detectCategory(safeText);
-  if (thoughtBubbles[cat].length >= 7) return;
-
-  const bubble = document.createElement("div");
-  bubble.className = "bubble";
-  bubble.innerText = safeText;
-  bubble.style.setProperty('--bubble-color', colors[cat]);
-  bubble.style.left = `${center.x}px`;
-  bubble.style.top = `${center.y}px`;
-  canvas.appendChild(bubble);
-  thoughtBubbles[cat].push(bubble);
-
-  const target = categoryElements[cat].el.getBoundingClientRect();
-  const targetX = target.left + target.width / 2;
-  const targetY = target.top + target.height / 2;
-  const startX = center.x;
-  const startY = center.y;
-
-  let frame = 0;
-  const maxFrames = 120;
-
-  function move() {
-    frame++;
-    const t = Math.min(1, frame / maxFrames);
-    const x = startX + (targetX - startX) * t;
-    const y = startY + (targetY - startY) * t;
-    bubble.style.left = `${x}px`;
-    bubble.style.top = `${y}px`;
-    if (t < 1) requestAnimationFrame(move);
-  }
-  move();
-
-  bubble.onclick = (e) => {
-    e.stopPropagation();
-    bubble.classList.add("pop-effect");
-    const sound = popSounds[Math.floor(Math.random() * popSounds.length)];
-    sound.currentTime = 0;
-    sound.play();
-    if (navigator.vibrate) navigator.vibrate(30);
-    setTimeout(() => {
-      bubble.remove();
-      const i = thoughtBubbles[cat].indexOf(bubble);
-      if (i !== -1) thoughtBubbles[cat].splice(i, 1);
-    }, 300);
-  };
 }
 
 function setupInput() {
@@ -161,10 +161,10 @@ function setupMic() {
 
     rec.onresult = e => {
       for (let i = e.resultIndex; i < e.results.length; i++) {
-        const r = e.results[i];
-        const t = r[0].transcript.trim();
-        if (r.isFinal && t.length > 3) {
-          t.split(/(?<=[.?!])\s+/).forEach(p => {
+        const result = e.results[i];
+        const text = result[0].transcript.trim();
+        if (result.isFinal && text.length > 3) {
+          text.split(/(?<=[.?!])\s+/).forEach(p => {
             if (p.trim().length > 3) addThought(p.trim());
           });
         }
@@ -188,7 +188,6 @@ function stopRecording() {
   isRecording = false;
 }
 
-// Initialize app
 createCategoryBubbles();
 setupInput();
 setupMic();
