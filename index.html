@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <link rel="manifest" href="manifest.json">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="Inkenspak">
+  <link rel="apple-touch-icon" href="logo.png">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Inkenspak V10</title>
+  <style>
+    #logo {
+      text-align: center;
+      padding: 10px 0;
+      background: white;
+      z-index: 101;
+      position: relative;
+    }
+
+    #logo img {
+      height: 50px;
+      object-fit: contain;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: #ffffff;
+      font-family: 'Arial', sans-serif;
+      overflow: hidden;
+    }
+    #controls {
+      padding: 15px;
+      text-align: center;
+      background: #fff;
+      z-index: 100;
+      position: relative;
+    }
+    #thoughtInput {
+      padding: 10px 15px;
+      font-size: 16px;
+      width: 300px;
+      border-radius: 20px;
+      border: 1px solid #ccc;
+    }
+    #addButton, #micButton, #mobileAddButton {
+      padding: 10px 20px;
+      font-size: 16px;
+      border-radius: 20px;
+      border: none;
+      margin-left: 10px;
+      background-color: #6c63ff;
+      color: white;
+      cursor: pointer;
+    }
+    #micButton.recording {
+      background-color: #e53935;
+      animation: pulse 1.5s infinite;
+    }
+    @keyframes pulse {
+      0% { box-shadow: 0 0 0 0 rgba(229, 57, 53, 0.7); }
+      70% { box-shadow: 0 0 0 10px rgba(229, 57, 53, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(229, 57, 53, 0); }
+    }
+    #canvas {
+      width: 100vw;
+      height: calc(100vh - 60px);
+      position: relative;
+      overflow: hidden;
+    }
+    .category {
+      position: absolute;
+      width: 160px;
+      height: 160px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      font-weight: bold;
+      color: white;
+      text-align: center;
+      box-shadow: 0 0 10px rgba(0,0,0,0.2);
+      background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.4), var(--cat-color));
+      transition: transform 0.3s ease;
+      cursor: pointer;
+      animation: bubbleWobble 2.5s ease-in-out infinite;
+    }
+    .bubble {
+      position: absolute;
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.3), var(--bubble-color));
+      box-shadow: 0 0 8px rgba(0,0,0,0.1);
+      font-size: 10px;
+      color: black;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      animation: fancyPopIn 0.8s ease-out forwards, floatBounce 3s ease-in-out infinite;
+      cursor: pointer;
+    }
+    .zoom-view {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(255, 255, 255, 0.8);
+      overflow: hidden;
+      z-index: 100;
+    }
+    .zoom-bubble {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.3), var(--bubble-color));
+      box-shadow: 0 0 12px rgba(0,0,0,0.15);
+      font-size: 12px;
+      color: black;
+      position: absolute;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      padding: 10px;
+      cursor: pointer;
+    }
+    @keyframes fancyPopIn {
+      0% { transform: scale(0.3) translateY(100px); opacity: 0; }
+      60% { transform: scale(1.2) translateY(-10px); opacity: 1; }
+      100% { transform: scale(1) translateY(0); }
+    }
+    @keyframes floatBounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-6px); }
+    }
+    @keyframes bubbleWobble {
+      0%, 100% { transform: scale(1) rotate(0deg); }
+      25% { transform: scale(1.05) rotate(2deg); }
+      50% { transform: scale(0.97) rotate(-2deg); }
+      75% { transform: scale(1.02) rotate(1deg); }
+    }
+    .pop-effect {
+      animation: popEffect 0.3s forwards;
+    }
+    @keyframes popEffect {
+      0% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.4); opacity: 0.7; }
+      100% { transform: scale(0); opacity: 0; }
+    }
+  </style>
+</head>
+<body>
+  <div id="logo">
+    <img src="logo.png" alt="Inkenspak Logo">
+  </div>
+  <div id="controls" style="padding-bottom: 20px;">
+    <input type="text" id="thoughtInput" placeholder="Speak or type your thought..." autofocus>
+    <button id="addButton">Add</button>
+    <button id="micButton">🎤</button>
+  </div>
+  <div id="canvas"></div>
+  <div style="text-align:center; padding: 10px;">
+    <button id="mobileAddButton">Add Thought</button>
+  </div>
+  <script>
+    const categories = ["Reflection", "Plans", "Emotions", "Productivity", "Growth", "Conversations", "Random"];
+    const colors = {
+      Reflection: '#6C63FF', Plans: '#00C896', Emotions: '#FF6B6B',
+      Productivity: '#F9A825', Growth: '#A3E635', Conversations: '#29B6F6', Random: '#9C27B0'
+    };
+    const keywordMap = {
+      Random: [],
+      Reflection: ["contemplate", "ponder", "ruminate", "introspect", "analyze", "evaluate", "self-awareness", "observe", "question", "think", "realize", "recognize", "philosophize", "consider", "reassess", "revisit", "clarify", "meditate", "mull", "reflect", "journal", "remember", "recall", "experience", "perspective", "balance", "discern", "awareness", "identity", "introspection", "focus", "truth", "clarity", "depth", "meaning", "purpose", "values", "emotion", "mental", "soul", "insight", "lessons", "memory", "past", "future", "feedback", "growth", "resolve", "why", "reason", "mindset", "shift", "realization", "lesson", "inner", "quiet", "energy", "response", "intuition", "assess", "weigh", "judge", "consideration", "assumption", "bias", "synthesis", "enlighten", "observe", "mirror", "legacy", "conclusion", "conscience", "roots", "understand", "acceptance", "discern", "note", "track", "compare", "emotional", "abstract", "logic", "vision", "worldview", "accept", "deep dive", "conceptualize", "overview", "hindsight", "mentality", "analyze", "insightful", "transparency", "truth", "self-worth", "reframe", "reflective", "speculate", "awaken", "mindfulness", "interpret", "sense", "self-study", "overview", "narrative", "reflective thinking", "value", "meaningful", "mental model", "identity shift", "intellectual", "deep thought", "reasoning", "perspective shift", "context", "clarify purpose", "explore self", "inner truth", "realign", "self-image", "trace", "overviewing", "feedback loop", "recheck", "pattern recognition", "perception", "thought trail", "truth-seeking", "core values", "directional thinking", "motivational review", "behavior analysis", "outlook", "thought alignment", "critical thinking", "self-question", "evaluate outcomes", "emotional review", "self-check", "mental clarity", "define self", "core beliefs", "self-dialogue", "brain loop", "purpose-driven", "value alignment", "ideological view", "worldview review", "analyze behavior", "intellectual honesty", "thought validation", "framework", "principles", "cognitive view", "inner bias", "bias check", "moral compass", "identity review", "retrospect", "self-history", "thought path", "question motive", "philosophical view", "deep reason", "why pattern", "feedback pattern", "truth map", "reflection phase", "self-discovery", "cognitive map", "conscious thought", "perspective arc", "mental process", "assumptive view"],
+      Plans: ["plan", "agenda", "goal", "schedule", "event", "prepare", "strategy", "organize", "priority", "next", "future", "deadline", "meeting", "to-do", "calendar", "reminder", "appointment", "objective", "target", "task", "errand", "item", "overview", "map", "route", "travel", "trip", "conference", "invite", "review", "commitment", "routine", "habit", "setup", "logistics", "list", "steps", "chart", "milestone", "progress", "focus", "execute", "draft", "proposal", "layout", "framework", "assign", "roadmap", "launch", "timing", "estimate", "prep", "checklist", "workflow", "blueprint", "forecast", "goals", "visions", "timeline", "direction", "intent", "structure", "initiate", "strategize", "queue", "action", "daily", "weekly", "monthly", "intentions", "outline", "kickoff", "timeframe", "notify", "flag", "action-plan", "get done", "coordinate", "ongoing", "block", "slot", "period", "check-in", "rundown", "targets", "assignment", "objectives", "align", "deploy", "implement", "brief", "recap", "planning", "mapped", "breakdown", "marker", "divide", "hour", "blocker", "sketch", "design", "move", "aim", "status", "organization", "priorities", "project", "track", "backlog", "sprint", "deadline", "deliverable", "timeline", "phases", "execution", "tasklist", "cycle", "iteration", "scope", "resources", "constraints", "budget", "duration", "milestones", "dependencies", "update", "risk", "review", "feedback", "launch plan", "revisit", "fine-tune", "adjust", "evaluate", "reschedule", "propose", "workflow", "flowchart", "diagram", "templates", "automation", "sequence", "repetition", "handoff", "approval", "roadblock", "collaboration", "assignments", "ownership", "follow-up", "objective", "target", "set date", "deadline-driven", "date range", "time slot", "time cap", "time sensitive", "critical path", "planning phase", "review cycle", "execution stage", "scope of work", "status report", "timeline estimate", "timeline check", "to-do sync", "next step", "aligned goal", "launch prep", "scheduled", "tracked", "time audit", "estimated", "delegated", "assigned", "actioned", "mapped", "roadmapped", "synced", "confirmed", "prioritized", "grouped", "checklisted", "bucketed", "batched", "reminded", "automated", "restructured", "staged", "broken down", "calendared", "flagged", "statused", "slotted", "reordered", "queued", "blocked", "cleared"],
+      Emotions: ["happy", "sad", "angry", "joy", "grief", "depressed", "anxious", "worry", "calm", "fear", "guilt", "shame", "love", "hope", "excited", "tired", "exhausted", "lonely", "peaceful", "rage", "frustrated", "tense", "uneasy", "irritated", "annoyed", "jealous", "envy", "proud", "disgust", "sick", "blame", "upset", "shaken", "mood", "mindset", "heart", "cried", "laugh", "shiver", "emotion", "emotional", "bliss", "resentment", "burnout", "panic", "elated", "serene", "relaxed", "relief", "warmth", "gratitude", "happiness", "emotionally", "feel", "feelings", "ache", "breakdown", "melancholy", "affection", "sympathy", "compassion", "joyful", "cheer", "sorrow", "comfort", "hurt", "confused", "smile", "tear", "dejected", "upset", "wounded", "fright", "tension", "fearful", "express", "cry", "burst", "trauma", "triggered", "offended", "ashamed", "glad", "light", "worry", "stress", "panic", "nervous", "distress", "eager", "excitement", "relief", "passion", "concern", "doubt", "trust", "peace", "trust", "bitter", "sensitive", "loved", "unloved", "choked", "conflict", "touched", "sympathy", "mourn", "weep", "rage", "fury", "vibe", "low", "high", "stable", "insecure", "unstable", "broken", "boost", "hopeless", "energized", "support", "overwhelmed", "suppress", "mad", "moody", "confide", "gush", "vent", "relate", "attach", "empathize", "cling", "explode", "detached", "crying", "healing", "healed", "heartfelt", "longing", "loss", "bursting", "secure", "hopeful", "hate", "loathe", "contempt", "resent", "spite", "hostile", "displease", "recoil", "revulsion", "scorn", "abhorrence", "detest", "despise", "dislike"],
+      Productivity: ["done", "accomplish", "achieve", "task", "progress", "focus", "work", "goal", "deadline", "plan", "calendar", "schedule", "effort", "manage", "track", "complete", "project", "motivation", "output", "efficiency", "list", "prioritize", "organized", "clarity", "pace", "momentum", "energy", "execute", "follow-up", "agenda", "output", "assignment", "burnout", "delegate", "system", "method", "routine", "habit", "structure", "framework", "optimize", "update", "commit", "sprint", "review", "log", "time", "block", "batch", "step", "checkpoint", "metric", "todo", "workflow", "daily", "weekly", "grind", "checkpoint", "productivity", "proactive", "pause", "push", "rush", "organize", "pipeline", "urgency", "flow", "track", "build", "ship", "align", "optimize", "execute", "deploy", "manage", "assign", "resolve", "improve", "target", "timed", "accountable", "team", "solo", "grind", "tasked", "overdue", "update", "clear", "done", "polish", "effort", "timebox", "note", "standup", "lean", "scrum", "kanban", "deep", "focus", "flow", "workload", "shipped", "finished", "started", "commitment", "finish", "initiate", "repeat", "streak", "plan", "early", "late", "on-time", "alert", "alertness", "stuck", "waiting", "move", "start", "resolve", "finish", "clear", "burn", "pace", "ramp", "slow", "delay", "grind", "organize", "fast", "prioritize", "balance", "focus", "maximize", "impact", "streamline", "reduce", "buffer", "gap", "effort", "finish", "rework", "allocate", "reserve", "clock", "execution", "done"],
+      Growth: ["learn", "improve", "develop", "progress", "advance", "skill", "training", "knowledge", "education", "reading", "research", "try", "attempt", "practice", "habit", "discipline", "expand", "upgrade", "evolve", "refine", "enhance", "challenge", "grow", "overcome", "adapt", "transform", "iterate", "level up", "build", "gain", "stretch", "breakthrough", "push", "competency", "ability", "talent", "shift", "reflect", "analyze", "track", "resolve", "mature", "wisdom", "curiosity", "focus", "concentration", "effort", "resilience", "grit", "vision", "potential", "strive", "master", "mentor", "explore", "seek", "course", "degree", "bootcamp", "webinar", "podcast", "journal", "routine", "daily", "weekly", "monthly", "goal", "short term", "long term", "revision", "iteration", "feedback", "coaching", "guidance", "metrics", "result", "success", "learned", "study", "path", "direction", "purpose", "clarify", "intention", "milestone", "achievement", "takeaway", "mindset", "grind", "self-help", "self-care", "motivate", "performance", "ambition", "drive", "actualize", "progression", "invest", "strategy", "better", "repetition", "coursework", "certification", "diploma", "long-term", "journey", "optimize", "refactor", "goal-setting", "setback", "bounce back", "adaptation", "pivot", "breakout", "push forward", "momentum", "studious", "refine", "toolset", "gear up", "plan ahead", "learn by doing", "project-based", "build skill", "personal best", "self-discipline", "progress tracker", "take action", "improve daily", "habit loop", "feedback cycle", "increment", "scale up"],
+      Conversations: ["talk", "chat", "conversation", "call", "meeting", "zoom", "discord", "text", "message", "discussion", "argue", "debate", "agree", "disagree", "speak", "say", "ask", "answer", "respond", "listen", "hearing", "words", "verbal", "tone", "dialogue", "interact", "feedback", "mention", "topic", "banter", "negotiate", "persuade", "influence", "connect", "contact", "email", "reply", "DM", "ping", "comment", "post", "thread", "note", "exchange", "interrupt", "interview", "presentation", "broadcast", "announcement", "report", "inform", "tell", "notify", "mention", "vocal", "gossip", "rumor", "reply", "quote", "highlight", "quote", "deliver", "clarify", "explain", "speech", "voice", "communication", "verbalize", "relay", "recap", "confirm", "introduce", "small talk", "dialog", "team", "group", "zoom call", "call log", "voice mail", "transcript", "interaction", "expression", "tone", "pause", "chat log", "say so", "follow-up", "question", "share", "lead", "talk over", "negotiate", "enunciate", "voice out", "vocalize", "converse", "share thoughts", "mutual", "paraphrase", "align", "notify", "reach out", "pinged", "group chat", "signal", "slack", "inbox", "communication", "clear up", "touch base", "bring up", "go over", "chat about", "catch up", "check in", "talk through", "zoom into", "podcast", "story", "tell story", "anecdote", "elaborate", "compliment", "thank", "introduce", "respond to", "reply to", "messaged", "called", "notified", "emailed", "left a note", "express", "discuss", "give input", "express opinion", "listen to", "conversation starter", "ask about", "voice mail", "talking point", "comment thread", "announcement", "direct message"]
+    };
+
+    const canvas = document.getElementById("canvas");
+    const input = document.getElementById("thoughtInput");
+    const micBtn = document.getElementById("micButton");
+    const center = { x: window.innerWidth / 2, y: (window.innerHeight - 60) / 2 };
+    const orbitRadius = 220;
+    const orbitSpeed = 0.00075;
+    const categoryElements = {};
+    const thoughtBubbles = {};
+    let time = 0;
+    let currentOverlay = null;
+    let isRecording = false;
+
+    const popSounds = ['pop1.wav', 'pop2.wav', 'pop3.wav', 'pop4.wav'].map(src => {
+      const audio = new Audio(src);
+      audio.load();
+      return audio;
+    });
+
+    function detectCategory(text) {
+      const t = text.toLowerCase();
+      for (let cat of categories) {
+        if (keywordMap[cat].some(word => t.includes(word))) return cat;
+      }
+      return "Random";
+    }
+
+    function createCategoryBubbles() {
+      categories.forEach((cat, i) => {
+        const el = document.createElement("div");
+        el.className = "category";
+        el.innerText = cat;
+        el.style.setProperty('--cat-color', colors[cat]);
+        canvas.appendChild(el);
+        categoryElements[cat] = { el: el, angle: (i / categories.length) * 2 * Math.PI };
+        thoughtBubbles[cat] = [];
+        el.onclick = () => {
+        if (navigator.vibrate) navigator.vibrate(20);
+        openZoom(cat);
+      };
+      });
+    }
+
+    function animate() {
+      time += 1;
+      categories.forEach(cat => {
+        const angle = categoryElements[cat].angle + time * orbitSpeed;
+        const x = center.x + orbitRadius * Math.cos(angle) - 80;
+        const y = center.y + orbitRadius * Math.sin(angle) - 80;
+        const el = categoryElements[cat].el;
+        el.style.left = `${x}px`;
+        el.style.top = `${y}px`;
+
+        thoughtBubbles[cat].forEach((b, i) => {
+          const offset = 20 + i * 8;
+          const innerAngle = (i / thoughtBubbles[cat].length) * 2 * Math.PI;
+          b.style.left = `${x + offset * Math.cos(innerAngle)}px`;
+          b.style.top = `${y + offset * Math.sin(innerAngle)}px`;
+        });
+      });
+      requestAnimationFrame(animate);
+    }
+
+    function addThought(text) {
+      const sanitized = text.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+      const cat = detectCategory(sanitized);
+      if (thoughtBubbles[cat].length >= 7) return;
+      const bubble = document.createElement("div");
+      bubble.className = "bubble";
+      bubble.innerText = sanitized;
+      bubble.style.setProperty('--bubble-color', colors[cat]);
+      bubble.style.left = `${center.x}px`;
+      bubble.style.top = `${center.y}px`;
+      canvas.appendChild(bubble);
+      thoughtBubbles[cat].push(bubble);
+
+      bubble.style.transition = 'all 1s ease';
+      bubble.style.transform = 'scale(1.2)';
+      setTimeout(() => {
+        bubble.style.transform = 'scale(0.9)';
+      }, 100);
+
+      let frame = 0;
+      const maxFrames = 120;
+      const target = categoryElements[cat].el.getBoundingClientRect();
+      const targetX = target.left + target.width / 2;
+      const targetY = target.top + target.height / 2;
+      const startX = center.x;
+      const startY = center.y;
+
+      function animateMove() {
+        frame++;
+        const t = Math.min(1, frame / maxFrames);
+        const x = startX + (targetX - startX) * t;
+        const y = startY + (targetY - startY) * t;
+        bubble.style.left = `${x}px`;
+        bubble.style.top = `${y}px`;
+        if (t < 1) requestAnimationFrame(animateMove);
+      }
+      animateMove();
+
+      bubble.onclick = (e) => {
+        e.stopPropagation();
+        bubble.classList.add("pop-effect");
+        const sound = popSounds[Math.floor(Math.random() * popSounds.length)];
+        sound.currentTime = 0;
+        sound.play();
+        if (navigator.vibrate) navigator.vibrate(30);
+        setTimeout(() => {
+          bubble.remove();
+          const index = thoughtBubbles[cat].indexOf(bubble);
+          if (index !== -1) thoughtBubbles[cat].splice(index, 1);
+        }, 300);
+      };
+    }
+
+    function openZoom(cat) {
+      if (currentOverlay) currentOverlay.remove();
+      const overlay = document.createElement("div");
+      overlay.className = "zoom-view";
+      overlay.style.setProperty('--cat-color', colors[cat]);
+      document.body.appendChild(overlay);
+
+      const container = document.createElement("div");
+      container.style.position = 'absolute';
+      container.style.width = '320px';
+      container.style.height = '320px';
+      container.style.borderRadius = '50%';
+      container.style.background = `radial-gradient(circle at 30% 30%, rgba(255,255,255,0.3), ${colors[cat]})`;
+      container.style.left = '50%';
+      container.style.top = '50%';
+      container.style.transform = 'translate(-50%, -50%) scale(1)';
+      container.style.transition = 'transform 0.5s ease';
+      overlay.appendChild(container);
+      setTimeout(() => {
+        container.style.transform = 'translate(-50%, -50%) scale(3.2)';
+      }, 10);
+
+      const bubbles = [...thoughtBubbles[cat]];
+      bubbles.forEach(b => {
+        const z = document.createElement("div");
+        z.className = "zoom-bubble";
+        z.innerText = b.innerText;
+        z.style.setProperty('--bubble-color', colors[cat]);
+        container.appendChild(z);
+        let x = 150 + Math.random() * 100;
+        let y = 150 + Math.random() * 100;
+        let dx = Math.random() > 0.5 ? 1 : -1;
+        let dy = Math.random() > 0.5 ? 1 : -1;
+        const animateZoom = () => {
+          const radius = 160; // center (320 / 2)
+          const cx = 160;
+          const cy = 160;
+          const dxRel = x - cx;
+          const dyRel = y - cy;
+          const dist = Math.sqrt(dxRel ** 2 + dyRel ** 2);
+          const speed = 1.2;
+
+          if (dist >= radius - 40) {
+            dx *= -1;
+            dy *= -1;
+          }
+
+          x += dx * speed;
+          y += dy * speed;
+          z.style.left = `${x}px`;
+          z.style.top = `${y}px`;
+          requestAnimationFrame(animateZoom);
+        };
+        animateZoom();
+        z.onclick = e => {
+          e.stopPropagation();
+          z.classList.add("pop-effect");
+          const sound = popSounds[Math.floor(Math.random() * popSounds.length)];
+          sound.currentTime = 0;
+          sound.play();
+          if (navigator.vibrate) navigator.vibrate(30);
+          setTimeout(() => {
+            z.remove();
+            const original = thoughtBubbles[cat].find(b => b.innerText === z.innerText);
+            if (original) {
+              const index = thoughtBubbles[cat].indexOf(original);
+              if (index !== -1) {
+                original.remove();
+                thoughtBubbles[cat].splice(index, 1);
+              }
+            }
+          }, 300);
+        };
+      });
+
+      function escListener(e) {
+        if (e.key === 'Escape') {
+          overlay.remove();
+          window.removeEventListener('keydown', escListener);
+        }
+      }
+      window.addEventListener('keydown', escListener);
+
+      currentOverlay = overlay;
+    }
+
+    document.getElementById("addButton").onclick = () => {
+      const val = input.value.trim();
+      if (val.length >= 3) {
+        addThought(val);
+        input.value = "";
+      }
+    };
+
+    document.getElementById("mobileAddButton").onclick = () => {
+      const val = input.value.trim();
+      if (val.length >= 3) {
+        addThought(val);
+        input.value = "";
+      }
+    };
+
+    input.addEventListener("keydown", e => {
+      if (e.key === "Enter") {
+        const val = input.value.trim();
+        if (val.length >= 3) {
+          addThought(val);
+          input.value = "";
+        }
+      }
+    });
+
+    micBtn.addEventListener('mousedown', (e) => {
+      if (e.button !== 0) return; // only respond to left click
+      if (isRecording) {
+        stopRecording();
+        return;
+      }
+
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      if (!SpeechRecognition) return alert("Speech recognition not supported.");
+
+      rec = new SpeechRecognition();
+      rec.continuous = true;
+      rec.lang = "en-US";
+      rec.interimResults = true;
+
+      rec.onresult = e => {
+        for (let i = e.resultIndex; i < e.results.length; i++) {
+          const result = e.results[i];
+          if (result.isFinal) {
+            const text = result[0].transcript.trim();
+            if (text.length > 3) {
+              text.split(/[.?!]/).forEach(p => {
+                if (p.trim().length > 3) addThought(p.trim());
+              });
+            }
+          }
+        }
+      };
+
+      rec.onerror = e => console.error("Mic error:", e);
+      rec.onend = () => stopRecording();
+
+      rec.start();
+      micBtn.classList.add('recording');
+      micBtn.style.backgroundColor = '#4CAF50'; // green
+      isRecording = true;
+    });
+
+    function stopRecording() {
+      if (rec) rec.stop();
+      micBtn.classList.remove('recording');
+      micBtn.style.backgroundColor = '#e53935'; // red
+      isRecording = false;
+    };
+
+    createCategoryBubbles();
+micBtn.style.backgroundColor = isRecording ? '#4CAF50' : '#e53935';
+    animate();
+</script>
+</body>
+</html>
