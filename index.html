@@ -70,8 +70,8 @@
     }
     .category {
       position: absolute;
-      width: 120px;
-      height: 120px;
+      width: 90px;
+      height: 90px;
       border-radius: 50%;
       display: flex;
       align-items: center;
@@ -88,8 +88,8 @@
     }
     .bubble {
       position: absolute;
-      width: 60px;
-      height: 60px;
+      width: 45px;
+      height: 45px;
       border-radius: 50%;
       background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.3), var(--bubble-color));
       box-shadow: 0 0 8px rgba(0,0,0,0.1);
@@ -186,7 +186,7 @@
     const input = document.getElementById("thoughtInput");
     const micBtn = document.getElementById("micButton");
     const center = { x: window.innerWidth / 2, y: (window.innerHeight - 60) / 2 };
-    const orbitRadius = 160;
+    const orbitRadius = 110;
     const orbitSpeed = 0.00075;
     const categoryElements = {};
     const thoughtBubbles = {};
@@ -231,7 +231,7 @@
         const x = center.x + orbitRadius * Math.cos(angle) - 80;
         const y = center.y + orbitRadius * Math.sin(angle) - 80;
         const el = categoryElements[cat].el;
-        el.style.left = `${x}px`;
+        el.style.left = `${x + 60}px`;
         el.style.top = `${y}px`;
 
         thoughtBubbles[cat].forEach((b, i) => {
@@ -306,8 +306,8 @@
 
       const container = document.createElement("div");
       container.style.position = 'absolute';
-      container.style.width = '200px';
-      container.style.height = '200px';
+      container.style.width = '150px';
+      container.style.height = '150px';
       container.style.borderRadius = '50%';
       container.style.background = `radial-gradient(circle at 30% 30%, rgba(255,255,255,0.3), ${colors[cat]})`;
       container.style.left = '50%';
@@ -316,7 +316,7 @@
       container.style.transition = 'transform 0.5s ease';
       overlay.appendChild(container);
       setTimeout(() => {
-        container.style.transform = 'translate(-50%, -50%) scale(1.5)';
+        container.style.transform = 'translate(-50%, -50%) scale(1.2)';
       }, 10);
 
       const bubbles = [...thoughtBubbles[cat]];
@@ -331,15 +331,18 @@
         let dx = Math.random() > 0.5 ? 1 : -1;
         let dy = Math.random() > 0.5 ? 1 : -1;
         const animateZoom = () => {
-          const radius = 160; // center (320 / 2)
-          const cx = 160;
-          const cy = 160;
+          const radius = 75; // shrink boundary to match 150px container
+          const cx = 100;
+          const cy = 100;
           const dxRel = x - cx;
           const dyRel = y - cy;
           const dist = Math.sqrt(dxRel ** 2 + dyRel ** 2);
           const speed = 1.2;
 
           if (dist >= radius - 40) {
+            const angle = Math.atan2(dyRel, dxRel);
+            x = cx + (radius - 41) * Math.cos(angle);
+            y = cy + (radius - 41) * Math.sin(angle);
             dx *= -1;
             dy *= -1;
           }
@@ -382,11 +385,31 @@
 
       currentOverlay = overlay;
 
+      // Swipe down to close on mobile
+      let startY = null;
+      overlay.addEventListener('touchstart', (e) => {
+        startY = e.touches[0].clientY;
+      }, { passive: true });
+
+      overlay.addEventListener('touchmove', (e) => {
+        if (startY !== null) {
+          const currentY = e.touches[0].clientY;
+          const diff = currentY - startY;
+          if (diff > 100) {
+            overlay.remove();
+            window.removeEventListener('keydown', escListener);
+            startY = null;
+          }
+        }
+      }, { passive: true });
+
       // Mobile exit button for zoom
       const exitBtn = document.createElement("button");
       exitBtn.innerText = "Close";
       exitBtn.style.position = "absolute";
-      exitBtn.style.top = "calc(50% + 120px)";
+      exitBtn.style.top = "calc(50% + 110px)";
+      exitBtn.style.zIndex = "200";
+      exitBtn.style.position = "fixed";
       exitBtn.style.left = "50%";
       exitBtn.style.transform = "translateX(-50%)";
       exitBtn.style.padding = "10px 15px";
